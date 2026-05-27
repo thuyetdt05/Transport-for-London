@@ -1,0 +1,23 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Databases & raw datasets (extremely large files)
+*.db
+*.sqlite
+Stops.csv
+TfL_stations.csv
+stations.csv
+stations .kml
+stations.kml
+
+# Output directories & reports (excluding source code)
+outputs/
+*.pdf
+*.docx
+*.html
+
+# IDEs
+.vscode/
+.idea/
