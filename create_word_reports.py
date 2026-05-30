@@ -844,14 +844,15 @@ def create_main_report():
         "Xóa ký tự đặc biệt không phải chữ-số-dấu nháy bằng regex [^\\w\\s'].",
         "Áp dụng các alias thủ công cho các trường hợp đặc biệt: 'bank'/'monument' → 'bank and monument', 'heathrow terminals 123' → 'heathrow terminals 1 2 3'.",
     ]
-    for i, step in enumerate(normalize_steps, 1):
+    for idx, step in enumerate(normalize_steps):
         p = doc.add_paragraph()
         p.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         p.paragraph_format.left_indent = Cm(1.0)
         p.paragraph_format.space_after = Pt(3)
         p.paragraph_format.line_spacing_rule = WD_LINE_SPACING.MULTIPLE
         p.paragraph_format.line_spacing = 1.5
-        run = p.add_run(f"Bước {i}: {step}")
+        letter = chr(97 + idx)
+        run = p.add_run(f"({letter}) {step}")
         set_run_font(run, size=13)
     
     regex_examples = [
@@ -890,14 +891,15 @@ def create_main_report():
         ("trend_slope", "Hệ số hồi quy tuyến tính (LinearRegression) của lưu lượng theo năm 2017–2021."),
         ("trend_category", "Phân loại xu hướng dựa trên trend_slope: Tăng mạnh (>150K), Tăng nhẹ, Ổn định, Giảm nhẹ, Giảm mạnh (<-150K)."),
     ]
-    for fname, fdesc in features:
+    for idx, (fname, fdesc) in enumerate(features):
         p = doc.add_paragraph()
         p.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         p.paragraph_format.left_indent = Cm(0.5)
         p.paragraph_format.space_after = Pt(4)
         p.paragraph_format.line_spacing_rule = WD_LINE_SPACING.MULTIPLE
         p.paragraph_format.line_spacing = 1.5
-        r1 = p.add_run(f"• {fname}: ")
+        letter = chr(97 + idx)
+        r1 = p.add_run(f"({letter}) {fname}: ")
         set_run_font(r1, size=13, bold=True)
         r2 = p.add_run(fdesc)
         set_run_font(r2, size=13)
@@ -938,14 +940,15 @@ def create_main_report():
         "Xuất CSV: Nút export dữ liệu đang lọc ra file CSV.",
         "Dark mode: Hỗ trợ chế độ bản đồ tối.",
     ]
-    for feat in folium_features:
+    for idx, feat in enumerate(folium_features):
         p = doc.add_paragraph()
         p.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         p.paragraph_format.left_indent = Cm(0.8)
         p.paragraph_format.space_after = Pt(3)
         p.paragraph_format.line_spacing_rule = WD_LINE_SPACING.MULTIPLE
         p.paragraph_format.line_spacing = 1.5
-        run = p.add_run(f"✓ {feat}")
+        letter = chr(97 + idx)
+        run = p.add_run(f"({letter}) {feat}")
         set_run_font(run, size=13)
     
     add_heading_1(doc, "4.5", "Lưu trữ và xuất dữ liệu")
@@ -1021,14 +1024,15 @@ def create_main_report():
         "Tiềm năng phục hồi: Năm 2021 tổng lưu lượng đạt 43% so với mức 2019 — nhanh hơn dự kiến ban đầu, cho thấy nhu cầu sử dụng giao thông công cộng được dồn nén sẽ bùng nổ khi hạn chế được dỡ bỏ.",
         "Mạng lưới đa tuyến: Các ga phục vụ nhiều tuyến (5+ tuyến) có xu hướng phục hồi nhanh hơn so với ga đơn tuyến, nhờ tính linh hoạt và nhiều hướng tiếp cận hơn cho hành khách.",
     ]
-    for ins in insights:
+    for idx, ins in enumerate(insights):
         p = doc.add_paragraph()
         p.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         p.paragraph_format.left_indent = Cm(0.5)
         p.paragraph_format.space_after = Pt(5)
         p.paragraph_format.line_spacing_rule = WD_LINE_SPACING.MULTIPLE
         p.paragraph_format.line_spacing = 1.5
-        run = p.add_run(f"→ {ins}")
+        letter = chr(97 + idx)
+        run = p.add_run(f"({letter}) {ins}")
         set_run_font(run, size=13)
     
     add_heading_1(doc, "5.4", "Đánh giá hiệu suất mô hình")
@@ -1055,14 +1059,15 @@ def create_main_report():
         ("Tương thích đa nền tảng:", "Code chạy được trên cả Windows, macOS, Linux và Google Colab, với xử lý UTF-8 encoding đặc biệt cho Windows console."),
     ]
     
-    for label, desc in pros:
+    for idx, (label, desc) in enumerate(pros):
         p = doc.add_paragraph()
         p.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         p.paragraph_format.left_indent = Cm(0.5)
         p.paragraph_format.space_after = Pt(5)
         p.paragraph_format.line_spacing_rule = WD_LINE_SPACING.MULTIPLE
         p.paragraph_format.line_spacing = 1.5
-        r1 = p.add_run(f"✓ {label} ")
+        letter = chr(97 + idx)
+        r1 = p.add_run(f"({letter}) {label} ")
         set_run_font(r1, size=13, bold=True, color=(0, 128, 0))
         r2 = p.add_run(desc)
         set_run_font(r2, size=13)
@@ -1077,14 +1082,15 @@ def create_main_report():
         ("Tính toán xu hướng linh hoạt:", "Trong mô hình Linear Regression phân tích xu hướng hành khách qua 5 năm, hệ thống sử dụng mặt nạ valid_mask để loại bỏ các điểm dữ liệu khuyết thiếu. Yêu cầu tối thiểu có 2 điểm dữ liệu thực tế (2 năm) để tiến hành fit đường thẳng hồi quy, ngăn ngừa lỗi Singular Matrix khi tính toán ma trận."),
         ("Tự động thích ứng số cụm KMeans:", "Hàm phân cụm KMeans sử dụng logic min(n_clusters, len(df)) đề phòng trường hợp tập dữ liệu lọc đầu vào có số lượng nhà ga nhỏ hơn số cụm yêu cầu (K=6), tránh lỗi phân cụm rỗng.")
     ]
-    for title, desc in qc_mechanisms:
+    for idx, (title, desc) in enumerate(qc_mechanisms):
         p = doc.add_paragraph()
         p.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         p.paragraph_format.left_indent = Cm(0.5)
         p.paragraph_format.space_after = Pt(4)
         p.paragraph_format.line_spacing_rule = WD_LINE_SPACING.MULTIPLE
         p.paragraph_format.line_spacing = 1.5
-        r1 = p.add_run(f"• {title} ")
+        letter = chr(97 + idx)
+        r1 = p.add_run(f"({letter}) {title} ")
         set_run_font(r1, size=13, bold=True)
         r2 = p.add_run(desc)
         set_run_font(r2, size=13)
@@ -1099,14 +1105,15 @@ def create_main_report():
         ("Bản đồ phụ thuộc internet:", "File HTML yêu cầu kết nối internet để load thư viện Leaflet.js và CartoDB tiles từ CDN."),
     ]
     
-    for label, desc in cons:
+    for idx, (label, desc) in enumerate(cons):
         p = doc.add_paragraph()
         p.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         p.paragraph_format.left_indent = Cm(0.5)
         p.paragraph_format.space_after = Pt(5)
         p.paragraph_format.line_spacing_rule = WD_LINE_SPACING.MULTIPLE
         p.paragraph_format.line_spacing = 1.5
-        r1 = p.add_run(f"✗ {label} ")
+        letter = chr(97 + idx)
+        r1 = p.add_run(f"({letter}) {label} ")
         set_run_font(r1, size=13, bold=True, color=(192, 0, 0))
         r2 = p.add_run(desc)
         set_run_font(r2, size=13)
@@ -1121,14 +1128,15 @@ def create_main_report():
         ("Bundle offline:", "Sử dụng Folium bundled mode hoặc webpack để đóng gói thư viện JavaScript vào file HTML, cho phép dùng offline."),
     ]
     
-    for label, desc in solutions:
+    for idx, (label, desc) in enumerate(solutions):
         p = doc.add_paragraph()
         p.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         p.paragraph_format.left_indent = Cm(0.5)
         p.paragraph_format.space_after = Pt(5)
         p.paragraph_format.line_spacing_rule = WD_LINE_SPACING.MULTIPLE
         p.paragraph_format.line_spacing = 1.5
-        r1 = p.add_run(f"→ {label} ")
+        letter = chr(97 + idx)
+        r1 = p.add_run(f"({letter}) {label} ")
         set_run_font(r1, size=13, bold=True, color=(31, 78, 121))
         r2 = p.add_run(desc)
         set_run_font(r2, size=13)
@@ -1618,14 +1626,15 @@ CLUSTER_NAMES = [  # Tên hiển thị cho 6 cụm theo thứ tự lưu lượng
         ("Sparkline SVG:", "renderSparkline() tạo biểu đồ đường SVG nhỏ (140×36px) hiển thị xu hướng 5 năm của từng nhà ga trong popup."),
     ]
     
-    for label, desc in js_components:
+    for idx, (label, desc) in enumerate(js_components):
         p = doc.add_paragraph()
         p.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         p.paragraph_format.left_indent = Cm(0.5)
         p.paragraph_format.space_after = Pt(4)
         p.paragraph_format.line_spacing_rule = WD_LINE_SPACING.MULTIPLE
         p.paragraph_format.line_spacing = 1.5
-        r1 = p.add_run(f"• {label} ")
+        letter = chr(97 + idx)
+        r1 = p.add_run(f"({letter}) {label} ")
         set_run_font(r1, size=13, bold=True)
         r2 = p.add_run(desc)
         set_run_font(r2, size=13)
@@ -1640,14 +1649,15 @@ CLUSTER_NAMES = [  # Tên hiển thị cho 6 cụm theo thứ tự lưu lượng
         ("BUG FIX #5 — Insufficient data for KMeans (dòng 560):", "actual_clusters = min(n_clusters, len(df)) đảm bảo không yêu cầu nhiều cụm hơn số điểm dữ liệu. Kèm cảnh báo rõ ràng ra console."),
     ]
     
-    for label, desc in bugfixes:
+    for idx, (label, desc) in enumerate(bugfixes):
         p = doc.add_paragraph()
         p.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         p.paragraph_format.left_indent = Cm(0.5)
         p.paragraph_format.space_after = Pt(5)
         p.paragraph_format.line_spacing_rule = WD_LINE_SPACING.MULTIPLE
         p.paragraph_format.line_spacing = 1.5
-        r1 = p.add_run(f"🔧 {label} ")
+        letter = chr(97 + idx)
+        r1 = p.add_run(f"({letter}) {label} ")
         set_run_font(r1, size=13, bold=True, color=(192, 80, 77))
         r2 = p.add_run(desc)
         set_run_font(r2, size=13)
@@ -1671,14 +1681,15 @@ CLUSTER_NAMES = [  # Tên hiển thị cho 6 cụm theo thứ tự lưu lượng
         ("Bước 6 — Keep-alive Loop:", "Main thread chạy while True với sleep(1) để giữ server hoạt động. Ctrl+C kích hoạt cleanup (tắt server, ngắt tunnel)."),
     ]
     
-    for label, desc in server_flow:
+    for idx, (label, desc) in enumerate(server_flow):
         p = doc.add_paragraph()
         p.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         p.paragraph_format.left_indent = Cm(0.5)
         p.paragraph_format.space_after = Pt(4)
         p.paragraph_format.line_spacing_rule = WD_LINE_SPACING.MULTIPLE
         p.paragraph_format.line_spacing = 1.5
-        r1 = p.add_run(f"→ {label} ")
+        letter = chr(97 + idx)
+        r1 = p.add_run(f"({letter}) {label} ")
         set_run_font(r1, size=13, bold=True)
         r2 = p.add_run(desc)
         set_run_font(r2, size=13)
@@ -1759,14 +1770,15 @@ CLUSTER_NAMES = [  # Tên hiển thị cho 6 cụm theo thứ tự lưu lượng
         "UTF-8 handling: Xử lý encoding đặc biệt cho Windows console (sys.stdout.reconfigure).",
         "Reproducibility: random_state=42 trong KMeans đảm bảo kết quả giống nhau mỗi lần chạy.",
     ]
-    for s in strengths:
+    for idx, s in enumerate(strengths):
         p = doc.add_paragraph()
         p.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         p.paragraph_format.left_indent = Cm(0.5)
         p.paragraph_format.space_after = Pt(4)
         p.paragraph_format.line_spacing_rule = WD_LINE_SPACING.MULTIPLE
         p.paragraph_format.line_spacing = 1.5
-        run = p.add_run(f"✓ {s}")
+        letter = chr(97 + idx)
+        run = p.add_run(f"({letter}) {s}")
         set_run_font(run, size=13)
     
     add_heading_1(doc, "4.2", "Điểm cần cải thiện")
@@ -1778,14 +1790,15 @@ CLUSTER_NAMES = [  # Tên hiển thị cho 6 cụm theo thứ tự lưu lượng
         "Magic numbers: Một số giá trị như minRadius=6, maxRadius=28, heat radius=28 không được định nghĩa là hằng số có tên, khó hiểu ý nghĩa.",
         "Thiếu logging module: Dùng print() thay vì Python logging module, không có log level (DEBUG/INFO/WARNING/ERROR).",
     ]
-    for w in weaknesses:
+    for idx, w in enumerate(weaknesses):
         p = doc.add_paragraph()
         p.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         p.paragraph_format.left_indent = Cm(0.5)
         p.paragraph_format.space_after = Pt(4)
         p.paragraph_format.line_spacing_rule = WD_LINE_SPACING.MULTIPLE
         p.paragraph_format.line_spacing = 1.5
-        run = p.add_run(f"✗ {w}")
+        letter = chr(97 + idx)
+        run = p.add_run(f"({letter}) {w}")
         set_run_font(run, size=13)
     
     add_heading_1(doc, "4.3", "Gợi ý nâng cấp Production")
@@ -1798,14 +1811,15 @@ CLUSTER_NAMES = [  # Tên hiển thị cho 6 cụm theo thứ tự lưu lượng
         ("API REST:", "Thay vì serve static HTML, xây dựng FastAPI backend cung cấp API endpoint /stations, /clusters, /stats để frontend có thể query động."),
         ("Monitoring:", "Tích hợp Prometheus + Grafana để theo dõi performance và usage metrics của web server."),
     ]
-    for label, desc in upgrades:
+    for idx, (label, desc) in enumerate(upgrades):
         p = doc.add_paragraph()
         p.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         p.paragraph_format.left_indent = Cm(0.5)
         p.paragraph_format.space_after = Pt(5)
         p.paragraph_format.line_spacing_rule = WD_LINE_SPACING.MULTIPLE
         p.paragraph_format.line_spacing = 1.5
-        r1 = p.add_run(f"→ {label} ")
+        letter = chr(97 + idx)
+        r1 = p.add_run(f"({letter}) {label} ")
         set_run_font(r1, size=13, bold=True)
         r2 = p.add_run(desc)
         set_run_font(r2, size=13)
@@ -1826,14 +1840,15 @@ CLUSTER_NAMES = [  # Tên hiển thị cho 6 cụm theo thứ tự lưu lượng
         ("Dung lượng ổ cứng:", "Tối thiểu 500MB (data + outputs)"),
         ("Kết nối internet:", "Cần thiết cho bản đồ (CDN tiles) và localtunnel"),
     ]
-    for label, desc in env_reqs:
+    for idx, (label, desc) in enumerate(env_reqs):
         p = doc.add_paragraph()
         p.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         p.paragraph_format.left_indent = Cm(0.5)
         p.paragraph_format.space_after = Pt(4)
         p.paragraph_format.line_spacing_rule = WD_LINE_SPACING.MULTIPLE
         p.paragraph_format.line_spacing = 1.5
-        r1 = p.add_run(f"• {label} ")
+        letter = chr(97 + idx)
+        r1 = p.add_run(f"({letter}) {label} ")
         set_run_font(r1, size=13, bold=True)
         r2 = p.add_run(desc)
         set_run_font(r2, size=13)
@@ -1847,14 +1862,15 @@ CLUSTER_NAMES = [  # Tên hiển thị cho 6 cụm theo thứ tự lưu lượng
         ("Bước 4 — Chạy pipeline:", "python final_project.py\n  Pipeline sẽ tự động chạy qua 6 bước và tạo thư mục outputs/"),
         ("Bước 5 — Xem bản đồ:", "Mở file outputs/london_tfl_map.html bằng trình duyệt web, hoặc chạy:\n  python serve_outputs.py\n  để phục vụ qua web server và có public URL"),
     ]
-    for label, desc in install_steps:
+    for idx, (label, desc) in enumerate(install_steps):
         p = doc.add_paragraph()
         p.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         p.paragraph_format.left_indent = Cm(0.5)
         p.paragraph_format.space_after = Pt(5)
         p.paragraph_format.line_spacing_rule = WD_LINE_SPACING.MULTIPLE
         p.paragraph_format.line_spacing = 1.5
-        r1 = p.add_run(f"📌 {label}\n")
+        letter = chr(97 + idx)
+        r1 = p.add_run(f"({letter}) {label}\n")
         set_run_font(r1, size=13, bold=True)
         r2 = p.add_run(f"   {desc}")
         set_run_font(r2, size=12)
@@ -1881,12 +1897,13 @@ CLUSTER_NAMES = [  # Tên hiển thị cho 6 cụm theo thứ tự lưu lượng
         "Tạo bản đồ HTML: ~10–15 giây",
         "Tổng cộng: ~30–60 giây",
     ]
-    for t in time_estimates:
+    for idx, t in enumerate(time_estimates):
         p = doc.add_paragraph()
         p.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.LEFT
         p.paragraph_format.left_indent = Cm(1.0)
         p.paragraph_format.space_after = Pt(3)
-        run = p.add_run(f"• {t}")
+        letter = chr(97 + idx)
+        run = p.add_run(f"({letter}) {t}")
         set_run_font(run, size=13)
     
     # Lưu file
@@ -1911,6 +1928,7 @@ def add_appendix_c_content(doc):
         
     with open(md_path, "r", encoding="utf-8") as f:
         lines = f.read().splitlines()
+    list_counter = 0
         
     in_code_block = False
     code_text = []
@@ -1978,6 +1996,10 @@ def add_appendix_c_content(doc):
             p = doc.add_paragraph()
             p.paragraph_format.left_indent = Cm(0.8)
             p.paragraph_format.space_after = Pt(3)
+            letter = chr(97 + list_counter)
+            list_counter += 1
+            r_pref = p.add_run(f"({letter}) ")
+            set_run_font(r_pref, size=13)
             text = stripped[2:]
             if "**" in text:
                 parts = text.split("**")
@@ -1987,7 +2009,12 @@ def add_appendix_c_content(doc):
             else:
                 run = p.add_run(text)
                 set_run_font(run, size=13)
+        elif not stripped:
+            # Dòng trống, giữ nguyên list_counter
+            continue
         else:
+            # Dòng khác (heading, table, etc.) reset list_counter
+            list_counter = 0
             # Đoạn văn thường
             p = doc.add_paragraph()
             p.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
@@ -2012,6 +2039,7 @@ def add_appendix_d_from_markdown(doc, md_path):
         
     with open(md_path, "r", encoding="utf-8") as f:
         lines = f.read().splitlines()
+    list_counter = 0
         
     in_code_block = False
     code_text = []
@@ -2075,6 +2103,10 @@ def add_appendix_d_from_markdown(doc, md_path):
             p = doc.add_paragraph()
             p.paragraph_format.left_indent = Cm(0.8)
             p.paragraph_format.space_after = Pt(3)
+            letter = chr(97 + list_counter)
+            list_counter += 1
+            r_pref = p.add_run(f"({letter}) ")
+            set_run_font(r_pref, size=13)
             text = stripped[2:]
             if "**" in text:
                 parts = text.split("**")
@@ -2084,7 +2116,12 @@ def add_appendix_d_from_markdown(doc, md_path):
             else:
                 run = p.add_run(text)
                 set_run_font(run, size=13)
+        elif not stripped:
+            # Dòng trống, giữ nguyên list_counter
+            continue
         else:
+            # Dòng khác (heading, table, etc.) reset list_counter
+            list_counter = 0
             # Đoạn văn thường
             p = doc.add_paragraph()
             p.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
