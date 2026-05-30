@@ -25,21 +25,19 @@ flowchart LR
         C1["SQLite DB"]
         C2["CSV / Excel"]
         C3["Bản đồ HTML"]
-        C4["Báo cáo PDF"]
     end
     A1 --> B1
     A2 --> B1
     A3 --> B1
     B1 --> B2 --> B3 --> B4
-    B4 --> C1 & C2 & C3 & C4
+    B4 --> C1 & C2 & C3
 ```
 
 ### 1.2 Cấu trúc tệp tin dự án
 
 | Tệp | Vai trò | Ngôn ngữ / Thư viện |
 |------|---------|---------------------|
-| [final_project.py](file:///c:/Users/My%20PC/Downloads/DE/final_project.py) | Pipeline ETL chính (1805 dòng) | Python, Pandas, Sklearn, SQLite, Folium |
-| [generate_pdf_report.py](file:///c:/Users/My%20PC/Downloads/DE/generate_pdf_report.py) | Sinh báo cáo PDF chuyên sâu | ReportLab, Matplotlib |
+| [final_project.py](file:///c:/Users/My%20PC/Downloads/DE/final_project.py) | Pipeline ETL chính (1737 dòng) | Python, Pandas, Sklearn, SQLite, Folium |
 | [serve_outputs.py](file:///c:/Users/My%20PC/Downloads/DE/serve_outputs.py) | HTTP Server + Public Tunnel | ThreadingHTTPServer, ngrok/localtunnel |
 | [verify_data.py](file:///c:/Users/My%20PC/Downloads/DE/verify_data.py) | Xác minh kết quả pipeline | Pandas |
 
@@ -422,35 +420,6 @@ Hàm [renderSparkline()](file:///c:/Users/My%20PC/Downloads/DE/final_project.py#
 
 ---
 
-## 9. BÁO CÁO PDF TỰ ĐỘNG
-
-### 9.1 Kiến trúc — [generate_pdf_report.py](file:///c:/Users/My%20PC/Downloads/DE/generate_pdf_report.py)
-
-| Thành phần | Kỹ thuật |
-|-----------|---------|
-| Engine | ReportLab `SimpleDocTemplate` |
-| Font tiếng Việt | `Arial.ttf` từ `C:\Windows\Fonts` (TTFont) |
-| Đánh số trang | `NumberedCanvas` — Canvas 2 lượt (two-pass) với "Page X of Y" |
-| Header/Footer | Tự vẽ đường kẻ + text trên canvas (trừ trang bìa) |
-| Biểu đồ | Matplotlib → ảnh PNG 300 DPI → chèn vào PDF qua `Image()` |
-
-### 9.2 NumberedCanvas — Kỹ thuật 2 lượt
-
-[NumberedCanvas](file:///c:/Users/My%20PC/Downloads/DE/generate_pdf_report.py#L72-L118):
-
-```
-Lượt 1: Lưu trạng thái mỗi trang vào _saved_page_states[]
-Lượt 2: Biết tổng số trang → vẽ "Trang X / Y" chính xác
-         Trang 1 (bìa): bỏ qua header/footer
-```
-
-### 9.3 Biểu đồ Matplotlib
-
-| Biểu đồ | Truy vấn SQL | Kiểu |
-|---------|-------------|------|
-| Xu hướng hành khách 2017-2021 | `SUM(passengers_XXXX)` | Line + Area fill |
-| So sánh cụm | `dim_clusters` | Horizontal bar (dual axis) |
-
 ---
 
 ## 10. WEB SERVER & DEPLOYMENT
@@ -527,11 +496,7 @@ Khi gộp ga trùng `station_key` trong TfL CSV:
 | `london_tfl.db` | SQLite | 2 bảng: fact_stations + dim_clusters |
 | `london_tfl_map.html` | HTML | Bản đồ tương tác Leaflet đầy đủ tính năng |
 | `FINAL_MAP.html` | HTML | Copy bản đồ ra root để dễ truy cập |
-| `TfL_Project_Report.pdf` | PDF | Báo cáo chuyên sâu 6 phần, 2 biểu đồ |
-| `Bao_Cao_TfL.pdf` | PDF | Copy báo cáo ra root |
-| `analysis_summary.txt` | TXT | Tóm tắt dạng văn bản thuần |
 | `unmatched_stations_log.txt` | TXT | Log ga bị loại bỏ |
-| `chart_*.png` | PNG 300dpi | Biểu đồ Matplotlib |
 
 ---
 
@@ -539,11 +504,11 @@ Khi gộp ga trùng `station_key` trong TfL CSV:
 
 | Metrics | Giá trị |
 |---------|---------|
-| Tổng dòng code Python | ~2,970 dòng (3 file chính) |
+| Tổng dòng code Python | ~2,060 dòng (2 file chính) |
 | Số thuật toán chính | 4 (Normalization, Nearest Neighbor, KMeans, LinearRegression) |
 | Số bug fix có đánh dấu | 5 |
 | Số tính năng bản đồ | 14 |
 | Số nguồn dữ liệu tích hợp | 3 (KML + TfL CSV + NaPTAN) |
-| Số format output | 7 (CSV, Excel, SQLite, HTML, PDF, TXT, PNG) |
-| Số thư viện Python | ~12 (pandas, numpy, sklearn, sqlite3, reportlab, matplotlib, folium, ...) |
+| Số format output | 4 (CSV, Excel, SQLite, HTML) |
+| Số thư viện Python | ~10 (pandas, numpy, sklearn, sqlite3, folium, ...) |
 | Số thư viện JavaScript | 4 (Leaflet, MarkerCluster, leaflet-heat, Bootstrap) |
