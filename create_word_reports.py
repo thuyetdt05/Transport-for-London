@@ -1903,65 +1903,105 @@ CLUSTER_NAMES = [  # Tên hiển thị cho 6 cụm theo thứ tự lưu lượng
 # ============================================================
 
 def add_appendix_c_content(doc):
-    """Thêm nội dung Phụ lục C từ tài liệu kiểm toán kỹ thuật"""
-    add_heading_2(doc, "C.1", "Phân tích tiêu chí chọn K=6 trong KMeans")
-    add_body_text(doc, "Trong mã nguồn triển khai chính thức của dự án (tại file final_project.py), biến hằng số N_CLUSTERS được thiết lập giá trị cố định bằng 6. Việc lựa chọn này không phải là một quyết định ngẫu nhiên mà được rút ra từ quá trình khảo sát thực nghiệm kết hợp với các yêu cầu nghiệp vụ thực tế (business requirements) của mạng lưới giao thông công cộng London (Transport for London - TfL).")
-    add_body_text(doc, "Mục tiêu tối thượng của pipeline phân tích dữ liệu là phân loại hệ thống nhà ga thành các nhóm có hành vi lưu lượng khách, mức độ kết nối mạng lưới và vị trí địa lý tương đồng. Số lượng nhóm cần phải vừa đủ lớn để phản ánh đúng sự phân hóa sâu sắc của các nhà ga (từ các ga siêu đô thị Zone 1 cực kỳ sầm uất đến các ga nhánh ngoại ô Zone 6 vắng vẻ), nhưng cũng phải đủ nhỏ để các nhà quản lý giao thông và các nhà hoạch định chính sách có thể đưa ra các giải pháp vận hành thực tế.")
+    """Đọc tệp kiem_tra_va_kich_ban_thuyet_trinh.md và parse động phần 1 (Kiểm toán kỹ thuật) vào Word"""
+    md_path = "kiem_tra_va_kich_ban_thuyet_trinh.md"
+    if not os.path.exists(md_path):
+        add_body_text(doc, "Tài liệu kiểm toán kỹ thuật chưa được tạo.")
+        return
+        
+    with open(md_path, "r", encoding="utf-8") as f:
+        lines = f.read().splitlines()
+        
+    in_code_block = False
+    code_text = []
     
-    add_heading_3(doc, "C.1.1", "Các phương pháp lý thuyết thường dùng để lựa chọn số cụm K")
-    add_body_text(doc, "Trong học máy không giám sát (unsupervised learning), việc xác định số lượng cụm K tối ưu là một bài toán kinh điển. Có ba phương pháp toán học và thực nghiệm phổ biến nhất được sử dụng để giải quyết vấn đề này:")
-    add_body_text(doc, "Thứ nhất, Phương pháp khuỷu tay (Elbow Method): Phương pháp này tính toán tổng bình phương khoảng cách từ các điểm dữ liệu đến tâm cụm của chúng (Inertia hoặc Within-Cluster Sum of Squares - WCSS) với các giá trị K khác nhau. Khi K tăng, Inertia luôn giảm. Tuy nhiên, ta tìm điểm mà tại đó tốc độ giảm của Inertia chậm lại rõ rệt, tạo thành một hình dạng giống như 'khuỷu tay' trên đồ thị. Điểm này đại diện cho sự cân bằng tốt nhất giữa số lượng cụm và độ phân tán nội bộ.")
-    add_body_text(doc, "Thứ hai, Chỉ số Silhouette (Silhouette Coefficient): Chỉ số này đánh giá chất lượng phân cụm bằng cách đo lường mức độ khớp của mỗi điểm dữ liệu với cụm được gán so với các cụm lân cận. Giá trị Silhouette dao động từ -1 đến 1. Một giá trị Silhouette trung bình cao (gần 1) cho thấy các cụm được phân tách rõ ràng và có độ nén cao. Giá trị âm hoặc quá thấp chỉ ra việc phân cụm bị chồng lấn hoặc sai lệch.")
+    in_table = False
+    table_headers = []
+    table_rows = []
     
-    k_metrics_headers = ["Số cụm (K)", "Tổng bình phương khoảng cách (Inertia)", "Chỉ số Silhouette trung bình", "Đánh giá toán học"]
-    k_metrics_rows = [
-        ["K = 2", "864.8", "0.4450", "Độ tách biệt cao nhất, nhưng thiếu chi tiết"],
-        ["K = 3", "650.6", "0.2923", "Bị chồng lấn ở các ga trung bình"],
-        ["K = 4", "518.5", "0.2881", "Phân tầng chưa rõ rệt"],
-        ["K = 5", "417.5", "0.2922", "Bắt đầu xuất hiện điểm uốn (Elbow)"],
-        ["K = 6", "364.3", "0.2757", "Điểm uốn rõ nét, đảm bảo tính diễn giải"],
-        ["K = 7", "329.8", "0.2824", "Cải thiện Inertia không đáng kể"],
-        ["K = 8", "295.6", "0.2918", "Phân mảnh cụm nhỏ"],
-        ["K = 9", "262.9", "0.3024", "Quá nhiều cụm, khó áp dụng thực tế"],
-        ["K = 10", "239.5", "0.3000", "Bị nhiễu thông tin nghiêm trọng"]
-    ]
-    add_table_with_caption(doc, "Bảng C.1: So sánh chỉ số Inertia và Silhouette Score theo số lượng cụm K",
-                           k_metrics_headers, k_metrics_rows, col_widths=[2.5, 4.5, 4.5, 5.0])
-    
-    add_body_text(doc, "Dựa trên số liệu thực nghiệm ở Bảng C.1, nếu chỉ nhìn thuần túy dưới góc độ toán học và chọn số cụm có Silhouette cao nhất, chúng ta sẽ chọn K=2 (Silhouette = 0.4450). Tuy nhiên, nếu chia 298 ga thành 2 cụm, chúng ta sẽ chỉ có một nhóm gồm các ga rất đông khách (nhóm Zone 1) và nhóm còn lại gồm tất cả các ga còn lại. Kết quả này quá thô và không mang lại bất kỳ giá trị thực tiễn nào cho việc quản trị giao thông.")
-    add_body_text(doc, "Điểm uốn của đồ thị Elbow bắt đầu xuất hiện rõ ràng tại K=5 và K=6 khi tốc độ giảm của Inertia chậm lại đáng kể (Inertia giảm mạnh từ K=2 là 864.8 xuống K=6 là 364.3, tức giảm hơn 57.8% lượng phương sai không giải thích được). Từ K=6 sang K=7, mức giảm Inertia chỉ còn khoảng 34.5 đơn vị, chứng tỏ việc thêm cụm không làm tăng đáng kể độ chặt chẽ của mô hình. Do đó, việc chọn K=6 là sự dung hòa tối ưu giữa tiêu chí toán học (Inertia thấp, Silhouette ổn định ở mức chấp nhận được 0.2757) và tiêu chí nghiệp vụ vận hành.")
-    
-    add_heading_2(doc, "C.2", "Tiêu chí xếp loại tên cụm (Cluster Names)")
-    add_body_text(doc, "Trong hàm run_kmeans_clustering của file final_project.py, logic gán tên cho các cụm được thiết lập hoàn toàn tự động dựa trên lưu lượng hành khách trung bình của cụm đó. Các bước thực hiện cụ thể trong mã nguồn như sau:")
-    add_body_text(doc, "Bước 1: Khởi tạo danh sách tên cụm có tính phân cấp từ cao xuống thấp: CLUSTER_NAMES = ['Siêu trung tâm', 'Ga lớn', 'Ga trung bình', 'Ga nhỏ', 'Ga ít khách', 'Ga rất ít khách'].")
-    add_body_text(doc, "Bước 2: Gom nhóm (group by) các ga theo cột cluster_id được mô hình KMeans dự đoán, sau đó tính toán giá trị trung bình (mean) của đặc trưng passengers_2021 cho từng nhóm.")
-    add_body_text(doc, "Bước 3: Sắp xếp các cụm này theo thứ tự giảm dần của lưu lượng hành khách trung bình năm 2021.")
-    add_body_text(doc, "Bước 4: Sử dụng chỉ số xếp hạng sau khi sắp xếp (từ 0 đến 5) làm chỉ mục (index) để ánh xạ trực tiếp sang danh sách CLUSTER_NAMES. Cụm có lưu lượng trung bình cao nhất (xếp hạng 0) sẽ luôn được gán tên 'Siêu trung tâm', và cụm có lưu lượng thấp nhất (xếp hạng 5) sẽ được gán tên 'Ga rất ít khách'.")
-    
-    add_heading_3(doc, "C.2.1", "Đánh giá các đặc trưng ảnh hưởng đến tiêu chí xếp loại")
-    add_body_text(doc, "Mặc dù tên cụm được gán trực tiếp dựa trên lưu lượng khách năm 2021, thuật toán KMeans phân cụm dựa trên cả 4 đặc trưng đầu vào:")
-    add_body_text(doc, "1. Hành khách trung bình năm 2021 (passengers_2021): Đây là đặc trưng quan trọng nhất định hình quy mô của nhà ga trong thời kỳ bình thường mới sau dịch. Lưu lượng khách của cụm 'Siêu trung tâm' đạt trung bình 37.3 triệu lượt, gấp hơn 22 lần so với cụm 'Ga rất ít khách' (1.63 triệu lượt).")
-    add_body_text(doc, "2. Số tuyến phục vụ (num_lines): Đặc trưng này đại diện cho vai trò trung chuyển của nhà ga trong mạng lưới giao thông. Cụm 'Siêu trung tâm' có số tuyến trung bình phục vụ trên mỗi ga là 4.62 tuyến (cao nhất mạng lưới), trong khi cụm 'Ga ít khách' chỉ có trung bình 1.03 tuyến.")
-    add_body_text(doc, "3. Vị trí địa lý (lat, lon): Tọa độ địa lý đóng vai trò như một lực hút không gian. Việc đưa lat/lon vào mô hình KMeans buộc các nhà ga nằm gần nhau về mặt địa lý có xu hướng rơi vào cùng một cụm. Điều này giải thích tại sao phần lớn các ga 'Siêu trung tâm' tập trung chặt chẽ tại khu vực Zone 1 (trung tâm tài chính và du lịch London).")
-    
-    cluster_sum_headers = ["Tên cụm", "Số ga", "Lưu lượng khách trung bình 2021", "Tác động COVID-19", "Tỷ lệ phục hồi 2021", "Số tuyến trung bình"]
-    cluster_sum_rows = [
-        ["Siêu trung tâm", "8 ga", "37,315,886 lượt", "-73.70%", "+71.82%", "4.62 tuyến"],
-        ["Ga lớn", "42 ga", "11,268,126 lượt", "-63.47%", "+39.17%", "2.67 tuyến"],
-        ["Ga trung bình", "78 ga", "3,136,520 lượt", "-54.91%", "+0.44%", "1.33 tuyến"],
-        ["Ga nhỏ", "80 ga", "2,833,787 lượt", "-57.42%", "+27.60%", "1.18 tuyến"],
-        ["Ga ít khách", "37 ga", "2,215,412 lượt", "-49.69%", "-10.64%", "1.03 tuyến"],
-        ["Ga rất ít khách", "53 ga", "1,630,990 lượt", "-41.42%", "-20.38%", "1.26 tuyến"]
-    ]
-    add_table_with_caption(doc, "Bảng C.2: Thống kê chi tiết đặc trưng của 6 cụm nhà ga TfL năm 2021",
-                           cluster_sum_headers, cluster_sum_rows, col_widths=[3.0, 2.0, 4.0, 3.0, 3.0, 2.5])
-    
-    add_heading_2(doc, "C.3", "So sánh số liệu giữa Code, Báo cáo và Slide")
-    add_body_text(doc, "Để đảm bảo tính toàn vẹn dữ liệu (data integrity) và tính chuyên nghiệp của đồ án, nhóm nghiên cứu đã thực hiện đối chiếu chéo toàn diện:")
-    add_body_text(doc, "1. Số ga phân tích: 298 ga đồng bộ hoàn toàn giữa Code, Slide và Báo cáo chính.")
-    add_body_text(doc, "2. Tác động COVID-19 (2019->2020): Đạt mức giảm -63.21% đồng bộ trên mọi tài liệu.")
-    add_body_text(doc, "3. Tỷ lệ phục hồi (2020->2021): Đạt mức tăng +16.82% đồng bộ.")
-    add_body_text(doc, "4. Số ga trong từng cụm: Siêu TT: 8 | Lớn: 42 | T.Bình: 78 | Nhỏ: 80 | Ít: 37 | Rất ít: 53. Khớp hoàn toàn với mô hình KMeans.")
+    for line in lines:
+        stripped = line.strip()
+        
+        # Dừng lại khi bắt đầu Phần 2 (Kịch bản thuyết trình) để tránh chèn kịch bản thuyết trình vào báo cáo chính thức
+        if "PHẦN 2:" in stripped or "PHÂN 2:" in stripped:
+            break
+            
+        # Xử lý code block
+        if stripped.startswith("```"):
+            if in_code_block:
+                p = doc.add_paragraph()
+                p.paragraph_format.left_indent = Cm(1.0)
+                p.paragraph_format.space_before = Pt(3)
+                p.paragraph_format.space_after = Pt(3)
+                run = p.add_run("\n".join(code_text))
+                set_run_font(run, "Courier New", size=10)
+                code_text = []
+                in_code_block = False
+            else:
+                in_code_block = True
+            continue
+            
+        if in_code_block:
+            code_text.append(line)
+            continue
+            
+        # Xử lý bảng
+        if stripped.startswith("|"):
+            parts = [p.strip() for p in stripped.split("|")[1:-1]]
+            if not in_table:
+                in_table = True
+                table_headers = parts
+            else:
+                if not all(c == '-' or c == ':' for c in parts[0]):
+                    table_rows.append(parts)
+            continue
+        else:
+            if in_table:
+                add_table_with_caption(doc, "Bảng phụ lục thông tin kiểm toán", table_headers, table_rows)
+                in_table = False
+                table_headers = []
+                table_rows = []
+                
+        if not stripped:
+            continue
+            
+        # Parse Markdown headings
+        if stripped.startswith("# "):
+            add_paragraph(doc, stripped[2:].upper(), align=WD_ALIGN_PARAGRAPH.CENTER, size=14, bold=True, space_before=12, space_after=6)
+        elif stripped.startswith("## "):
+            add_heading_1(doc, "", stripped[3:])
+        elif stripped.startswith("### "):
+            add_heading_2(doc, "", stripped[4:])
+        elif stripped.startswith("> "):
+            add_paragraph(doc, stripped[2:], align=WD_ALIGN_PARAGRAPH.JUSTIFY, size=13, italic=True, space_after=6)
+        elif stripped.startswith("- ") or stripped.startswith("• "):
+            p = doc.add_paragraph()
+            p.paragraph_format.left_indent = Cm(0.8)
+            p.paragraph_format.space_after = Pt(3)
+            text = stripped[2:]
+            if "**" in text:
+                parts = text.split("**")
+                for idx, part in enumerate(parts):
+                    run = p.add_run(part)
+                    set_run_font(run, size=13, bold=(idx % 2 == 1))
+            else:
+                run = p.add_run(text)
+                set_run_font(run, size=13)
+        else:
+            # Đoạn văn thường
+            p = doc.add_paragraph()
+            p.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+            p.paragraph_format.first_line_indent = Cm(1.0)
+            p.paragraph_format.space_after = Pt(6)
+            text = line
+            if "**" in text:
+                parts = text.split("**")
+                for idx, part in enumerate(parts):
+                    run = p.add_run(part)
+                    set_run_font(run, size=13, bold=(idx % 2 == 1))
+            else:
+                run = p.add_run(text)
+                set_run_font(run, size=13)
 
 
 def add_appendix_d_from_markdown(doc, md_path):
