@@ -150,15 +150,7 @@ def add_table_with_caption(doc, caption_text, headers, data_rows, col_widths=Non
         p.alignment = WD_ALIGN_PARAGRAPH.CENTER
         run = p.add_run(h)
         set_run_font(run, size=12, bold=True)
-        # Header background
-        tc = cell._tc
-        tcPr = tc.get_or_add_tcPr()
-        shd = OxmlElement('w:shd')
-        shd.set(qn('w:val'), 'clear')
-        shd.set(qn('w:color'), 'auto')
-        shd.set(qn('w:fill'), '1F4E79')
-        tcPr.append(shd)
-        run.font.color.rgb = RGBColor(255, 255, 255)
+        pass # No background shading or white text
     
     # Data rows
     for row_data in data_rows:
@@ -249,7 +241,7 @@ def create_main_report():
     p = add_paragraph(doc, "ĐỀ TÀI:", align=WD_ALIGN_PARAGRAPH.CENTER,
                       size=15, bold=True, space_after=6)
     p = add_paragraph(doc, "LONDON TRANSPORT ANALYSIS", align=WD_ALIGN_PARAGRAPH.CENTER,
-                      size=18, bold=True, color=(31, 78, 121), space_after=4)
+                      size=18, bold=True, space_after=4)
     p = add_paragraph(doc, "Phân tích Hệ thống Giao thông Công cộng London (TfL)", align=WD_ALIGN_PARAGRAPH.CENTER,
                       size=14, bold=False, italic=True, space_after=8)
     
@@ -1068,7 +1060,7 @@ def create_main_report():
         p.paragraph_format.line_spacing = 1.5
         letter = chr(97 + idx)
         r1 = p.add_run(f"({letter}) {label} ")
-        set_run_font(r1, size=13, bold=True, color=(0, 128, 0))
+        set_run_font(r1, size=13, bold=True)
         r2 = p.add_run(desc)
         set_run_font(r2, size=13)
     
@@ -1114,7 +1106,7 @@ def create_main_report():
         p.paragraph_format.line_spacing = 1.5
         letter = chr(97 + idx)
         r1 = p.add_run(f"({letter}) {label} ")
-        set_run_font(r1, size=13, bold=True, color=(192, 0, 0))
+        set_run_font(r1, size=13, bold=True)
         r2 = p.add_run(desc)
         set_run_font(r2, size=13)
     
@@ -1137,7 +1129,7 @@ def create_main_report():
         p.paragraph_format.line_spacing = 1.5
         letter = chr(97 + idx)
         r1 = p.add_run(f"({letter}) {label} ")
-        set_run_font(r1, size=13, bold=True, color=(31, 78, 121))
+        set_run_font(r1, size=13, bold=True)
         r2 = p.add_run(desc)
         set_run_font(r2, size=13)
     
@@ -1291,7 +1283,7 @@ def create_code_analysis():
         add_paragraph(doc, "")
     
     add_paragraph(doc, "TÀI LIỆU PHÂN TÍCH CODE", align=WD_ALIGN_PARAGRAPH.CENTER,
-                  size=18, bold=True, color=(31, 78, 121), space_after=8)
+                  size=18, bold=True, space_after=8)
     add_paragraph(doc, "Dự án: London Transport Analysis (TfL)", align=WD_ALIGN_PARAGRAPH.CENTER,
                   size=14, bold=True, space_after=4)
     add_paragraph(doc, "Phân tích chi tiết codebase — Nhóm 14", align=WD_ALIGN_PARAGRAPH.CENTER,
@@ -1658,7 +1650,7 @@ CLUSTER_NAMES = [  # Tên hiển thị cho 6 cụm theo thứ tự lưu lượng
         p.paragraph_format.line_spacing = 1.5
         letter = chr(97 + idx)
         r1 = p.add_run(f"({letter}) {label} ")
-        set_run_font(r1, size=13, bold=True, color=(192, 80, 77))
+        set_run_font(r1, size=13, bold=True)
         r2 = p.add_run(desc)
         set_run_font(r2, size=13)
     
