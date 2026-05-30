@@ -675,54 +675,6 @@ def print_analysis_report(df: pd.DataFrame, merge_report: MergeReport) -> None:
     print("   hanh khach giam manh trong nam 2020 do COVID-19 va co dau hieu phuc hoi nam 2021.")
 
 
-def build_summary_text(df: pd.DataFrame) -> str:
-    """Tao noi dung tom tat de luu ra file txt."""
-    total_2019 = df["passengers_2019"].sum()
-    total_2020 = df["passengers_2020"].sum()
-    total_2021 = df["passengers_2021"].sum()
-    covid_change = (total_2020 - total_2019) / total_2019 * 100 if total_2019 else np.nan
-    recovery_change = (total_2021 - total_2020) / total_2020 * 100 if total_2020 else np.nan
-
-    lines = [
-        "BAO CAO TOM TAT - PHAN TICH HE THONG TfL",
-        "=" * 60,
-        f"So ga duoc phan tich: {len(df)}",
-        f"Tong hanh khach 2019: {total_2019:,.0f}",
-        f"Tong hanh khach 2020: {total_2020:,.0f}",
-        f"Tong hanh khach 2021: {total_2021:,.0f}",
-        f"Tac dong COVID-19 2019 -> 2020: {covid_change:.2f}%",
-        f"Muc phuc hoi 2020 -> 2021: {recovery_change:.2f}%",
-        "",
-        "THONG KE CLUSTER",
-        "-" * 60,
-    ]
-
-    for _, row in create_cluster_summary(df).iterrows():
-        lines.append(
-            f"Cluster {int(row['cluster_id'])} - {row['cluster_name']}: "
-            f"{int(row['so_ga'])} ga, "
-            f"hanh khach TB 2021 = {row['hanh_khach_tb_2021']:,.0f}, "
-            f"COVID impact TB = {row['covid_impact_tb']:.2f}%"
-        )
-
-    lines.extend(["", "XU HUONG HANH KHACH", "-" * 60])
-    for trend_name, count in df["trend_category"].value_counts().items():
-        lines.append(f"{trend_name}: {count} ga")
-
-    lines.extend(
-        [
-            "",
-            "KET LUAN",
-            "-" * 60,
-            "Pipeline da thuc hien day du cac buoc trong bao cao do an:",
-            "Extract, Transform, Load, KMeans clustering, COVID Analysis, Trend Analysis va Visualization.",
-            "Ket qua cho thay nam 2020 co muc sut giam hanh khach ro ret do COVID-19,",
-            "sau do co dau hieu phuc hoi vao nam 2021.",
-        ]
-    )
-    return "\n".join(lines)
-
-
 # ============================================================================
 # 5. LOAD - LUU TRU KET QUA
 # ============================================================================
@@ -733,7 +685,6 @@ def save_outputs(df: pd.DataFrame, output_dir: Path) -> None:
     csv_path = output_dir / "london_tfl_cleaned.csv"
     excel_path = output_dir / "london_tfl_results.xlsx"
     db_path = output_dir / "london_tfl.db"
-    summary_path = output_dir / "analysis_summary.txt"
     cluster_summary = create_cluster_summary(df)
 
     df.to_csv(csv_path, index=False)
@@ -750,9 +701,6 @@ def save_outputs(df: pd.DataFrame, output_dir: Path) -> None:
         print(f"Da luu Excel: {excel_path}")
     except ImportError:
         print("Chua cai openpyxl va khong the tu dong cai dat, bo qua file Excel.")
-
-    summary_path.write_text(build_summary_text(df), encoding="utf-8")
-    print(f"Da luu bao cao tom tat: {summary_path}")
 
     sqlite_df = make_sqlite_safe_dataframe(df)
     sqlite_cluster_summary = make_sqlite_safe_dataframe(cluster_summary)
@@ -1774,23 +1722,7 @@ def run_pipeline() -> pd.DataFrame:
     print_title("BUOC 5 - VISUALIZATION")
     create_folium_map(final_df, output_dir)
 
-    print_title("BUOC 6 - GENERATE PDF REPORT")
-    try:
-        from generate_pdf_report import generate_pdf_report as make_pdf
-        pdf_path = output_dir / "TfL_Project_Report.pdf"
-        db_path = output_dir / "london_tfl.db"
-        make_pdf(db_path, pdf_path)
-        
-        # Copy to root as Bao_Cao_TfL.pdf for convenience
-        root_pdf_path = output_dir.parent / "Bao_Cao_TfL.pdf"
-        try:
-            import shutil
-            shutil.copy2(pdf_path, root_pdf_path)
-            print(f"Da copy bao cao PDF vao root: {root_pdf_path}")
-        except Exception as e:
-            print(f"Loi copy Bao_Cao_TfL.pdf: {e}")
-    except Exception as e:
-        print(f"Loi khi sinh bao cao PDF: {e}")
+    # Bao cao PDF khong duoc yeu cau trong cau truc thu muc
 
     print_title("HOAN THANH")
     print(f"So ga cuoi cung: {len(final_df)}")

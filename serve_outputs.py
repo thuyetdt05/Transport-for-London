@@ -293,8 +293,6 @@ if __name__ == "__main__":
     print("Serving static files from:", OUTPUT_DIR)
     print("Open Map Locally: http://127.0.0.1:%d/london_tfl_map.html" % PORT)
     print("Open Map on LAN: http://%s:%d/london_tfl_map.html" % (get_local_ip(), PORT))
-    print("Open PDF Report Locally: http://127.0.0.1:%d/TfL_Project_Report.pdf" % PORT)
-    print("Open PDF Report on LAN: http://%s:%d/TfL_Project_Report.pdf" % (get_local_ip(), PORT))
 
     local_url = f"http://127.0.0.1:{PORT}/london_tfl_map.html"
     test_local_url(local_url)
